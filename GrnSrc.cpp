@@ -31,7 +31,11 @@ void GrnSrc::process(int bypass_state){
 
 // Linearly-interpolated buffer write - - idx: frameNumber, channel: 0(left), 1(right), input: float
 void GrnSrc::bufWr(float idx, int channel, float input){
-	idx = fmodf(idx + this->numFrames, this->numFrames);
+	if (idx < 0)
+		idx += this->numFrames;
+	else if (idx > this->numFrames)
+		idx -= this->numFrames;
+		
 	int x0 = floor(idx);
 	if ((idx - x0) == 0.0f){
 		this->delayBuf[channel][x0] = input;
@@ -47,7 +51,11 @@ void GrnSrc::bufWr(float idx, int channel, float input){
 
 // Linearly-interpolated buffer write - idx: frameNumber, channel: 0(left), 1(right).
 float GrnSrc::bufRd(float idx, int channel){
-	idx = fmodf(idx + this->numFrames, this->numFrames);
+	if (idx < 0)
+		idx += this->numFrames;
+	else if (idx > this->numFrames)
+		idx -= this->numFrames;
+		
 	int x0 = floor(idx);
 	int x1 = x0 + 1;
 	x1 = (x1 >= numFrames) ? 0 : x1;

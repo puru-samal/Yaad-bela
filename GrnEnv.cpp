@@ -46,22 +46,6 @@ void GrnEnv::process(){
 				this->envOut[voice] = 0.0f;
 				break;
 		}
-		/*
-		switch(this->scheduler.env) {
-			case -1:
-				this->envOut[voice] = cosineSwell(this->scheduler.envPtr[voice]);
-				break;
-			case 0:
-				this->envOut[voice] = cosineBell(this->scheduler.envPtr[voice]);
-				break;
-			case 1:
-				this->envOut[voice] = cosinePerc(this->scheduler.envPtr[voice]);
-				break;
-			default:
-				this->envOut[voice] = 0.0f;
-				break;
-		}
-		*/
 	}
 }
 
@@ -131,6 +115,7 @@ float GrnEnv::cosineSwell(float phase) {
 	return envOut;
 }
 
+// Load cosine bell envelope into LUT
 float GrnEnv::setLUT_Bell(int phase, int LUT_sz) {
 	float envOut = 0.0f;
 	float atkDur = (int) LUT_sz * 0.5;
@@ -152,7 +137,8 @@ float GrnEnv::setLUT_Bell(int phase, int LUT_sz) {
 	return envOut;
 	
 }
-	
+
+// Load cosine perc envelope into LUT	
 float GrnEnv::setLUT_Perc(int phase, int LUT_sz) {
 	float envOut = 0.0f;
 	float atkDur = (int) LUT_sz * 0.125;
@@ -174,7 +160,8 @@ float GrnEnv::setLUT_Perc(int phase, int LUT_sz) {
 	return envOut;
 	
 }
-	
+
+// Load cosine swell envelope into LUT
 float GrnEnv::setLUT_Swell(int phase, int LUT_sz) {
 	float envOut = 0.0f;
 	float atkDur = (int) LUT_sz * 0.875;

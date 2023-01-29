@@ -96,14 +96,18 @@ void GrnScheduler::setAllParams() {
 // Increments read pointer, Checks for grain triggers, Each tap has 8 grain voices
 void GrnScheduler::tapScheduler(){
 	// Read Pointer
-	this->readPtr   = fmodf(this->Src.writePtr - this->dtime + this->Src.numFrames, this->Src.numFrames);
+	this->readPtr = this->Src.writePtr - this->dtime;
+	if(this->readPtr > this->Src.numFrames)
+		this->readPtr -= this->Src.numFrames;
+	else if(this->readPtr < 0)
+		this->readPtr += this->Src.numFrames;
 	
 	// Grain Trigger
 	if ((int) this->sz == 0) {
 		this->grnTrig = -1; // Avoid divide by zero
 		this->sz = 512.0;
 	} else {
-		this->grnTrig =  ((int) fmodf(this->Src.writePtr, this->sz) == 0) ? 1 : 0; // 1 when sz is hit, 0 when not
+		this->grnTrig =  ((int) fmodf_neon(this->Src.writePtr, this->sz) == 0) ? 1 : 0; // 1 when sz is hit, 0 when not
 	}
 	
 	// Voice Incrementor based in gTrig
@@ -131,14 +135,22 @@ void GrnScheduler::voiceScheduler(int voiceNum){
 	if(this->dir == 1) {
 		offset = constrain(offset, 0, this->Src.numFrames - this->dtime); 
 		offset = this->samp_readPtr[voiceNum] - offset;
-		offset = fmodf(offset + this->Src.numFrames, this->Src.numFrames);
+		
+		if(offset > this->Src.numFrames)
+			offset -= this->Src.numFrames;
+		else if(offset < 0)
+			offset += this->Src.numFrames;
 		
 		this->grnCounter[voiceNum] = trig ? 0 : this->grnCounter[voiceNum] + this->rt;
 		this->grnCounter[voiceNum] = constrain(this->grnCounter[voiceNum], 0, this->rt * this->sz);
 	}
 	else if (this->dir == -1) {
 		offset = this->samp_readPtr[voiceNum] + this->dtime;
-		offset = fmodf(offset + this->Src.numFrames, this->Src.numFrames);
+		
+		if(offset > this->Src.numFrames)
+			offset -= this->Src.numFrames;
+		else if(offset < 0)
+			offset += this->Src.numFrames;
 		
 		this->grnCounter[voiceNum] = trig ? 0 : this->grnCounter[voiceNum] - this->rt;
 		this->grnCounter[voiceNum] = constrain(this->grnCounter[voiceNum], -1.0 * this->rt * this->sz, 0);
@@ -148,6 +160,9 @@ void GrnScheduler::voiceScheduler(int voiceNum){
 	this->envPtr[voiceNum] = min(this->envPtr[voiceNum], this->sz);
 	
 	this->grnPtr[voiceNum] = offset + this->grnCounter[voiceNum];
-	this->grnPtr[voiceNum] = fmodf(this->grnPtr[voiceNum] + this->Src.numFrames, this->Src.numFrames);
+	if(this->grnPtr[voiceNum] > this->Src.numFrames)
+			this->grnPtr[voiceNum] -= this->Src.numFrames;
+		else if(offset < 0)
+			this->grnPtr[voiceNum] += this->Src.numFrames;
 
 }
