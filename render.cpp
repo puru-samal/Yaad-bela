@@ -1,9 +1,11 @@
+/*
+Yaad: A variable multitap granular delay effect.
+Author: Purusottam Samal
+*/
 #include <Bela.h>
 #include <libraries/Gui/Gui.h>
 #include <libraries/Scope/Scope.h>
 #include <libraries/AudioFile/AudioFile.h>
-#include <libraries/math_neon/math_neon.h>
-#include <cmath>
 #include <vector>
 #include "Global.h"
 #include "GrnTap.h"
@@ -82,7 +84,9 @@ void render(BelaContext *context, void *userData) // Called each block
 	
 	if (gui.isConnected()) {
 		for (unsigned int n = 0; n < context->audioFrames; n++){
-			elapsedSamps++;
+
+			if(++elapsedSamps > endFrame)
+				elapsedSamps = startFrame;
 			
 			Src.process(Glob._bypass);
 			
@@ -101,7 +105,7 @@ void render(BelaContext *context, void *userData) // Called each block
 			
 			for (unsigned int channel = 0; channel < context->audioOutChannels; channel++){
 				
-				float in = sampleData[channel][fmod(elapsedSamps, (endFrame - startFrame))] * Glob._inLvl;
+				float in = sampleData[channel][elapsedSamps] * Glob._inLvl;
 				
 				TapsOut[channel] = Tap1.out(channel) 
 								 + Tap2.out(channel) 
@@ -129,7 +133,7 @@ void render(BelaContext *context, void *userData) // Called each block
 				
 				float out = (1.0f - Glob._dryWet) * in + Glob._dryWet * TapsOut[channel];
 		    	audioWrite(context, n, channel, out * Glob._outLvl);
-		    	
+	
 			}
 		}
 	}

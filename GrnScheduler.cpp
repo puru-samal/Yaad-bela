@@ -161,8 +161,8 @@ void GrnScheduler::voiceScheduler(int voiceNum){
 	
 	this->grnPtr[voiceNum] = offset + this->grnCounter[voiceNum];
 	if(this->grnPtr[voiceNum] > this->Src.numFrames)
-			this->grnPtr[voiceNum] -= this->Src.numFrames;
-		else if(offset < 0)
-			this->grnPtr[voiceNum] += this->Src.numFrames;
+		this->grnPtr[voiceNum] -= this->Src.numFrames;
+	else if(offset < 0)
+		this->grnPtr[voiceNum] += this->Src.numFrames;
 
 }
