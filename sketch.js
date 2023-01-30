@@ -10,7 +10,7 @@ let DRY_WET = 0.5;
 let SPREAD = 0;
 let DETUNE = 0;
 let N_TAPS = 1;
-let maxTaps = 5;
+let maxTaps = 6;
 let INPUT_LVL = 0.5;
 let OUTPUT_LVL = 0.5;
 

@@ -11,7 +11,7 @@ Author: Purusottam Samal
 #include "GrnTap.h"
 
 // Maximum Number of Taps
-int MAX_TAPS = 5;
+int MAX_TAPS = 6;
 
 Scope scope;
 Gui gui;
@@ -28,6 +28,7 @@ GrnTap Tap2(2, Src, Interface, Glob);
 GrnTap Tap3(3, Src, Interface, Glob);
 GrnTap Tap4(4, Src, Interface, Glob);
 GrnTap Tap5(5, Src, Interface, Glob);
+GrnTap Tap6(6, Src, Interface, Glob);
 
 // Butterworth coefficients for low-pass filter @ 8000Hz
 float a0 = 0.1772443606634904;
@@ -67,6 +68,7 @@ bool setup(BelaContext *context, void *userData)
 	Tap3.setup();
 	Tap4.setup();
 	Tap5.setup();
+	Tap6.setup();
 	
 	// Debugging
 	scope.setup(8, context->audioSampleRate);
@@ -82,8 +84,10 @@ void render(BelaContext *context, void *userData) // Called each block
 	Interface.process(guiData.getAsFloat());
 	Glob.setGlobalParams();
 	
+	
 	if (gui.isConnected()) {
 		for (unsigned int n = 0; n < context->audioFrames; n++){
+			
 
 			if(++elapsedSamps > endFrame)
 				elapsedSamps = startFrame;
@@ -96,6 +100,7 @@ void render(BelaContext *context, void *userData) // Called each block
 			Tap3.setParams();
 			Tap4.setParams();
 			Tap5.setParams();
+			Tap6.setParams();
 			
 			// Begin processing taps (scheduler, granulator, envelope)
 			Tap1.process();
@@ -103,7 +108,8 @@ void render(BelaContext *context, void *userData) // Called each block
 			Tap3.process();
 			Tap4.process();
 			Tap5.process();
-			
+			Tap6.process();
+		
 			for (unsigned int channel = 0; channel < context->audioOutChannels; channel++){
 				
 				// Audio input
@@ -114,7 +120,8 @@ void render(BelaContext *context, void *userData) // Called each block
 								 + Tap2.out(channel) 
 								 + Tap3.out(channel) 
 								 + Tap4.out(channel)
-								 + Tap5.out(channel);
+								 + Tap5.out(channel)
+								 + Tap6.out(channel);
 				
 				// Input + scaledfeedback * tapOutput -> Biquad LP Filter (8000Hz) -> Buffer write
 				int scl = (Glob._nTaps == 0) ? 1 : Glob._nTaps;
@@ -142,7 +149,7 @@ void render(BelaContext *context, void *userData) // Called each block
 				
 				// Write output to output device
 		    	audioWrite(context, n, channel, out * Glob._outLvl);
-	
+				
 			}
 		}
 	}
