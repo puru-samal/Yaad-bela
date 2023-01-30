@@ -12,6 +12,7 @@ GrnEnv::~GrnEnv(){}
 void GrnEnv::setup(){
 	this->envOut.resize(this->scheduler.maxVoices);
 	
+	// Set grn envelopes in LUT's
 	for (unsigned int n = 0; n < this->tableLength; n++){
 		this->bell[n]  = setLUT_Bell(n, this->tableLength);
 		this->perc[n]  = setLUT_Perc(n, this->tableLength);
@@ -19,9 +20,7 @@ void GrnEnv::setup(){
 	}
 }
 
-
-
-// Generates envelope output. Stored in this->envOut[voice]
+// Generates envelope output. LUT approach used. Output stored and can be accesed through envOut->voice
 void GrnEnv::process(){
 	for (unsigned int voice = 0; voice < this->scheduler.maxVoices; voice++){
 		
@@ -49,7 +48,7 @@ void GrnEnv::process(){
 	}
 }
 
-// Cosine bell envelope: phase -> envPtr (accessed from scheduler) 
+// Cosine bell envelope: phase -> envPtr (accessed from scheduler). Computationally expensive!
 float GrnEnv::cosineBell(float phase) {
 	float envOut = 0.0f;
 	float atkDur = this->scheduler.sz * 0.5;
@@ -71,7 +70,7 @@ float GrnEnv::cosineBell(float phase) {
 	return envOut;
 }
 
-// Cosine perc envelope: phase -> envPtr (accessed from scheduler) 
+// Cosine perc envelope: phase -> envPtr (accessed from scheduler). Computationally expensive!
 float GrnEnv::cosinePerc(float phase) {
 	float envOut = 0.0f;
 	float atkDur = this->scheduler.sz * 0.125;

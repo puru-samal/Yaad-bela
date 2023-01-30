@@ -24,10 +24,11 @@ void GrnTap::setParams(){
 
 // Begin scheduler, envelope and granulator pointers/calculations etc..
 void GrnTap::process(){
-	this->scheduler.tapScheduler();
-	this->env.process();
-	this->grn.process();
+	this->scheduler.tapScheduler(); // Calculates grnTrigs, grnPtrs and envPtrs
+	this->env.process();            // Processes grn envelopes
+	this->grn.process();            // Processes grn src
 	
+	// Random Panning
 	float noise = 2.0 * (float)rand() / (float)RAND_MAX - 1.0;
 	this->pan = this->scheduler.grnTrig ? (0.5 + (noise * 0.5 * this->Glob._spread)) : this->pan;
 }
@@ -41,7 +42,8 @@ float GrnTap::out(int channel){
 		out += this->grn.grnOut[channel][voice] * this->env.envOut[voice] * pan;
 	}
 	
-	if ((int) this->scheduler.dtime == 0){
+	if ((int) this->scheduler.dtime == 0){ 
+		// If delay is 0, no output from tap
 		return 0.0f;
 	}
 	else {

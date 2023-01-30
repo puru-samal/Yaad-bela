@@ -3,6 +3,10 @@
 #include "param.h"
 
 class Global {
+	/*
+	- An interface for only Global data from GUI
+	*/
+	
 	public:
 	GUIData& Gui; // Reference to global gui data
 	

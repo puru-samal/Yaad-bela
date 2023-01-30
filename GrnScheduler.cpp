@@ -52,15 +52,14 @@ void GrnScheduler::setParam(tapParam t){
 	
 		case plyRt:
 			{
-				//Increment-based transition
-				float noise = 2.0 * (float)rand() / (float)RAND_MAX - 1.0;
-				float pch = noise * 0.5 * this->Gui.getGlobalParam(detune) + this->Gui.getTapParam(plyRt, this->tapNum);
+				float pch = this->Gui.getTapParam(plyRt, this->tapNum);
 				this->rt = (this->grnTrig == 1) ? powf_neon(2, pch/12) : this->rt;
 				break;
 			}
 		case plyDir:
 			target = (int) this->Gui.getTapParam(plyDir, this->tapNum);
 			if (target == 0){
+				// Randomly choose between forwars and reverse
 				this->dir = (this->voiceIsActive[0] && this->grnTrig) ? ((rand() > RAND_MAX/2) ? -1 : 1) : this->dir;	
 			} else {
 				this->dir = target;
@@ -89,18 +88,14 @@ void GrnScheduler::setAllParams() {
 	setParam(plyRt);
 	setParam(plyDir);
 	setParam(grnEnv);
-	setParam(tapLPF);
-	setParam(tapHPF);
+	
+	// Independent filters havent been implemented yet
+	//setParam(tapLPF); 
+	//setParam(tapHPF);
 }
 
 // Increments read pointer, Checks for grain triggers, Each tap has 8 grain voices
 void GrnScheduler::tapScheduler(){
-	// Read Pointer
-	this->readPtr = this->Src.writePtr - this->dtime;
-	if(this->readPtr > this->Src.numFrames)
-		this->readPtr -= this->Src.numFrames;
-	else if(this->readPtr < 0)
-		this->readPtr += this->Src.numFrames;
 	
 	// Grain Trigger
 	if ((int) this->sz == 0) {
@@ -128,29 +123,22 @@ void GrnScheduler::voiceScheduler(int voiceNum){
 	int trig = (this->voiceIsActive[voiceNum] && this->grnTrig);
 	
 	// Sample the read pointer when trigger is recieved and this voice is active
-	this->samp_readPtr[voiceNum] = trig ? this->readPtr : this->samp_readPtr[voiceNum];
+	this->samp_readPtr[voiceNum] = trig ? this->Src.writePtr - this->dtime : this->samp_readPtr[voiceNum];
 	
+	// Offset based on playback rate and grain size
 	float offset = (this->rt - 1) * this->sz;
 	
 	if(this->dir == 1) {
+		// For forward playback offset backwards
 		offset = constrain(offset, 0, this->Src.numFrames - this->dtime); 
 		offset = this->samp_readPtr[voiceNum] - offset;
-		
-		if(offset > this->Src.numFrames)
-			offset -= this->Src.numFrames;
-		else if(offset < 0)
-			offset += this->Src.numFrames;
 		
 		this->grnCounter[voiceNum] = trig ? 0 : this->grnCounter[voiceNum] + this->rt;
 		this->grnCounter[voiceNum] = constrain(this->grnCounter[voiceNum], 0, this->rt * this->sz);
 	}
 	else if (this->dir == -1) {
+		// For reverse playback offset forwards
 		offset = this->samp_readPtr[voiceNum] + this->dtime;
-		
-		if(offset > this->Src.numFrames)
-			offset -= this->Src.numFrames;
-		else if(offset < 0)
-			offset += this->Src.numFrames;
 		
 		this->grnCounter[voiceNum] = trig ? 0 : this->grnCounter[voiceNum] - this->rt;
 		this->grnCounter[voiceNum] = constrain(this->grnCounter[voiceNum], -1.0 * this->rt * this->sz, 0);
@@ -159,7 +147,14 @@ void GrnScheduler::voiceScheduler(int voiceNum){
 	this->envPtr[voiceNum] = trig ? 0 : this->envPtr[voiceNum] + 1;
 	this->envPtr[voiceNum] = min(this->envPtr[voiceNum], this->sz);
 	
-	this->grnPtr[voiceNum] = offset + this->grnCounter[voiceNum];
+	float invFs = 1 / this->Src.sampleRate;
+	float mod = 2.0f * (this->Src.sampleRate/1000) // Vibrato
+			  * this->Gui.getGlobalParam(detune)
+			  * sinf_neon(2.0f * M_PI * 4 * this->envPtr[voiceNum] * invFs);
+	mod = (this->dir == 1) ? mod * 1.0f : mod * -1.0f; // Switch polarity for reverse playback
+	this->grnPtr[voiceNum] = offset + this->grnCounter[voiceNum] + mod;
+	
+	// Wrap within circular buffer
 	if(this->grnPtr[voiceNum] > this->Src.numFrames)
 		this->grnPtr[voiceNum] -= this->Src.numFrames;
 	else if(offset < 0)

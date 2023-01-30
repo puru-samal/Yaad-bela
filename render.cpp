@@ -97,6 +97,7 @@ void render(BelaContext *context, void *userData) // Called each block
 			Tap4.setParams();
 			Tap5.setParams();
 			
+			// Begin processing taps (scheduler, granulator, envelope)
 			Tap1.process();
 			Tap2.process();
 			Tap3.process();
@@ -105,17 +106,21 @@ void render(BelaContext *context, void *userData) // Called each block
 			
 			for (unsigned int channel = 0; channel < context->audioOutChannels; channel++){
 				
+				// Audio input
 				float in = sampleData[channel][elapsedSamps] * Glob._inLvl;
 				
+				// Tap output
 				TapsOut[channel] = Tap1.out(channel) 
 								 + Tap2.out(channel) 
 								 + Tap3.out(channel) 
 								 + Tap4.out(channel)
 								 + Tap5.out(channel);
 				
+				// Input + scaledfeedback * tapOutput -> Biquad LP Filter (8000Hz) -> Buffer write
 				int scl = (Glob._nTaps == 0) ? 1 : Glob._nTaps;
 				float bufIn = in + (Glob._feedback/scl) * TapsOut[channel];
 				
+				// Biquad LPF 
 				float tempIn = bufIn; 
 				
 				bufIn = a0 * bufIn
@@ -129,9 +134,13 @@ void render(BelaContext *context, void *userData) // Called each block
         		y_2[channel] = y_1[channel];
     			y_1[channel] = bufIn;
 				
+				// Write into buffer
 				Src.bufWr(Src.writePtr, channel, bufIn);
 				
+				// Output
 				float out = (1.0f - Glob._dryWet) * in + Glob._dryWet * TapsOut[channel];
+				
+				// Write output to output device
 		    	audioWrite(context, n, channel, out * Glob._outLvl);
 	
 			}

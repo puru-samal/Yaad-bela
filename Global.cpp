@@ -1,10 +1,13 @@
 #include <Bela.h>
 #include "Global.h"
 
+// Constructor
 Global::Global(GUIData& g) : Gui(g) {}
 
+// Destructor
 Global::~Global(){}
 
+// Set individual params
 void Global::setGlobalParam(globalParam gP){
 	switch(gP) {
 		float target;
@@ -92,6 +95,7 @@ void Global::setGlobalParam(globalParam gP){
 	}	
 }
 
+// Set all params
 void  Global::setGlobalParams() {
 	setGlobalParam(bypass);
 	setGlobalParam(tempo);
