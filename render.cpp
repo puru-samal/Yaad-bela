@@ -62,7 +62,7 @@ bool setup(BelaContext *context, void *userData)
 	sampleData = AudioFileUtilities::load(fileName, endFrame - startFrame, startFrame);
 	
 	// Setup 
-	Src.setup(2, context->audioSampleRate);
+	Src.setup(context->audioOutChannels, context->audioSampleRate);
 	Tap1.setup();
 	Tap2.setup();
 	Tap3.setup();
@@ -113,7 +113,8 @@ void render(BelaContext *context, void *userData) // Called each block
 			for (unsigned int channel = 0; channel < context->audioOutChannels; channel++){
 				
 				// Audio input
-				float in = sampleData[channel][elapsedSamps] * Glob._inLvl;
+				//float in = sampleData[channel][elapsedSamps] * Glob._inLvl; // Test Input
+				float in = audioRead(context, n, channel) * Glob._inLvl;
 				
 				// Tap output
 				TapsOut[channel] = Tap1.out(channel) 
