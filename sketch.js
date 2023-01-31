@@ -237,8 +237,10 @@ function doubleClicked() {
     double click on dir -> Change playback direction (Fwd, Rev, Rnd)
   */
   for (let i = 0; i < N_TAPS; i++) {
+  	tapCtrls[i].killSwitch();
     tapCtrls[i].changeEnv(envVals);
     tapCtrls[i].changeDir(dirVals);
+    
   }
 }
 
@@ -515,6 +517,11 @@ class tapMainCtrl extends UI_Factory {
     this.currDiameter = map(14 / 22, 0, 1, 1 / 2, 1, true) * this.diameter;
     this.label = label;
     this.selector = selector;
+    
+    this.killState = 0;
+    this.tapFillColor_curr = "#FFFFFF";
+    this.tapFillColor_off = "#FFFFFF";
+    this.tapFillColor_on = "#e9a41e";
 
     this.szCtrl = new UI_Factory(this.currPosX, this.currPosY, this.diameter);
     this.dirCtrl = new UI_Factory(this.currPosX, this.currPosY, this.diameter);
@@ -657,10 +664,21 @@ class tapMainCtrl extends UI_Factory {
     this.hpfCtrl.mouseDrag();
     this.hpfVal = this.hpfCtrl.currVal;
   }
+  
+  killSwitch() {
+    if (this.mouseOn) {
+      this.tapFillColor_curr =
+        this.tapFillColor_curr == this.tapFillColor_off
+          ? this.tapFillColor_on
+          : this.tapFillColor_off;
+      this.killState = this.killState == 0 ? 1 : 0;
+    }
+  }
 
   mainDisplay() {
     push();
     noStroke();
+    fill(this.tapFillColor_curr);
     circle(this.currPosX, this.currPosY, this.currDiameter);
     push();
     translate(this.currPosX, this.currPosY);
