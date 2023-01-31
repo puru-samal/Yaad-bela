@@ -23,6 +23,7 @@ class GrnTap {
 	GrnEnv env;             // Grain envelope object
 	Granulator grn;         // Granulator object
 	float pan;              // Panning
+	int autopan_phase;
 	
 	GrnTap(int t, GrnSrc& s, GUIData& g, Global& glb);
 	~GrnTap();

@@ -1,5 +1,6 @@
 #include <Bela.h>
 #include <stdlib.h> 
+#include <libraries/math_neon/math_neon.h>
 #include <cmath>
 #include "GrnTap.h"
 
@@ -31,6 +32,14 @@ void GrnTap::process(){
 	// Random Panning
 	float noise = 2.0 * (float)rand() / (float)RAND_MAX - 1.0;
 	this->pan = this->scheduler.grnTrig ? (0.5 + (noise * 0.5 * this->Glob._spread)) : this->pan;
+	
+	/*
+	// Autopan based on grnSz 
+	float invSz = 1/this->scheduler.sz;
+	float mod = sinf_neon(2.0f * M_PI * this->scheduler.envPtr[0] * invSz);
+	this->pan = 0.5 + this->Glob._spread * 0.5 * mod; 
+	*/
+	
 }
 
 // Get output from tap

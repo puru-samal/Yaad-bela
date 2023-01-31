@@ -6,6 +6,7 @@ Author: Purusottam Samal
 #include <libraries/Gui/Gui.h>
 #include <libraries/Scope/Scope.h>
 #include <libraries/AudioFile/AudioFile.h>
+#include <libraries/math_neon/math_neon.h>
 #include <vector>
 #include "Global.h"
 #include "GrnTap.h"
@@ -84,7 +85,6 @@ void render(BelaContext *context, void *userData) // Called each block
 	Interface.process(guiData.getAsFloat());
 	Glob.setGlobalParams();
 	
-	
 	if (gui.isConnected()) {
 		for (unsigned int n = 0; n < context->audioFrames; n++){
 			
@@ -110,11 +110,12 @@ void render(BelaContext *context, void *userData) // Called each block
 			Tap5.process();
 			Tap6.process();
 		
+		
 			for (unsigned int channel = 0; channel < context->audioOutChannels; channel++){
 				
 				// Audio input
-				//float in = sampleData[channel][elapsedSamps] * Glob._inLvl; // Test Input
-				float in = audioRead(context, n, channel) * Glob._inLvl;
+				float in = sampleData[channel][elapsedSamps] * Glob._inLvl; // Test Input
+				//float in = audioRead(context, n, channel) * Glob._inLvl;
 				
 				// Tap output
 				TapsOut[channel] = Tap1.out(channel) 
