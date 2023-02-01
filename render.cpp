@@ -85,8 +85,6 @@ void render(BelaContext *context, void *userData) // Called each block
 	Interface.process(guiData.getAsFloat());
 	Glob.setGlobalParams();
 	
-	rt_printf("%f\n", Tap1.fadeOut);
-	
 	if (gui.isConnected()) {
 		for (unsigned int n = 0; n < context->audioFrames; n++){
 

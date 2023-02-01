@@ -30,17 +30,17 @@ void GrnTap::process(){
 	this->grn.process();            // Processes grn src
 	
 	// Random Panning
-	//float noise = 2.0 * (float)rand() / (float)RAND_MAX - 1.0;
-	//this->pan = this->scheduler.grnTrig ? (0.5 + (noise * 0.5 * this->Glob._spread)) : this->pan;
+	float noise = 2.0 * (float)rand() / (float)RAND_MAX - 1.0;
+	this->pan = this->scheduler.grnTrig ? (0.5 + (noise * 0.5 * this->Glob._spread)) : this->pan;
 
 	this->fadeOut = process_killSwitch(this->scheduler.kill, 22050);
 	
-	
+	/*
 	// Autopan based on grnSz 
 	float invSz = 1/this->scheduler.sz;
-	float mod = sinf_neon(2.0f * M_PI * this->scheduler.envPtr[0] * invSz);
+	float mod = ((int) powf_neon(-1, this->tapNum)) * sinf_neon(2.0f * M_PI * this->scheduler.envPtr[0] * invSz);
 	this->pan = 0.5 + this->Glob._spread * 0.5 * mod; 
-
+	*/
 	
 }
 
