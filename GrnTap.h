@@ -23,7 +23,11 @@ class GrnTap {
 	GrnEnv env;             // Grain envelope object
 	Granulator grn;         // Granulator object
 	float pan;              // Panning
-	int autopan_phase;
+	
+	int prev_kill;
+	int fadeCounter = 0;
+	int fadeState = 1;
+	float fadeOut = 0.0f;
 	
 	GrnTap(int t, GrnSrc& s, GUIData& g, Global& glb);
 	~GrnTap();
@@ -32,6 +36,7 @@ class GrnTap {
 	void setParams();
 	void process(); // Starts scheduler, granulator and envelope processing
 	float out(int channel); // Get tap output
+	float process_killSwitch(int killState, int fadeLen);
 	
 	private:
 	

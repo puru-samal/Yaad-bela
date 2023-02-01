@@ -6,6 +6,7 @@ Author: Purusottam Samal
 #include <libraries/Gui/Gui.h>
 #include <libraries/Scope/Scope.h>
 #include <libraries/AudioFile/AudioFile.h>
+#include <libraries/math_neon/math_neon.h>
 #include <vector>
 #include "Global.h"
 #include "GrnTap.h"
@@ -84,6 +85,8 @@ void render(BelaContext *context, void *userData) // Called each block
 	Interface.process(guiData.getAsFloat());
 	Glob.setGlobalParams();
 	
+	rt_printf("%f\n", Tap1.fadeOut);
+	
 	if (gui.isConnected()) {
 		for (unsigned int n = 0; n < context->audioFrames; n++){
 
@@ -107,8 +110,7 @@ void render(BelaContext *context, void *userData) // Called each block
 			Tap4.process();
 			Tap5.process();
 			Tap6.process();
-		
-		
+			
 			for (unsigned int channel = 0; channel < context->audioOutChannels; channel++){
 				
 				// Audio input
@@ -116,16 +118,16 @@ void render(BelaContext *context, void *userData) // Called each block
 				//float in = audioRead(context, n, channel) * Glob._inLvl;
 				
 				// Tap output
-				TapsOut[channel] = Tap1.out(channel) 
+				TapsOut[channel] = Tap1.out(channel)
 								 + Tap2.out(channel) 
-								 + Tap3.out(channel) 
+								 + Tap3.out(channel)
 								 + Tap4.out(channel)
 								 + Tap5.out(channel)
 								 + Tap6.out(channel);
 				
 				// Input + scaledfeedback * tapOutput -> Biquad LP Filter (8000Hz) -> Buffer write
 				int scl = (Glob._nTaps == 0) ? 1 : Glob._nTaps;
-				float bufIn = in + (Glob._feedback/scl) * TapsOut[channel];
+				float bufIn = in + (float) ((Glob._feedback/scl) * TapsOut[channel]);
 				
 				// Biquad LPF 
 				float tempIn = bufIn; 
@@ -149,7 +151,7 @@ void render(BelaContext *context, void *userData) // Called each block
 				
 				// Write output to output device
 		    	audioWrite(context, n, channel, out * Glob._outLvl);
-				
+
 			}
 		}
 	}
