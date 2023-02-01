@@ -34,6 +34,7 @@ class GrnScheduler {
 	int env;     // Grain Envelope (1: Perc, -1: Swell, 0: Bell)
 	float lpf;   // LPF Cutoff (20hz - 20kHz)
 	float hpf;   // HPF Cutoff (20hz - 20kHz)
+	int kill;
 	
 	// Prev values (for one-pole filter)
 	float alpha = 0.99; // Affects speed of transition of parameter (0.99->slow, 0.9999->fast)

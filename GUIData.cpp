@@ -20,5 +20,5 @@ float GUIData::getGlobalParam(globalParam p){
 // Gets global parameter based on enum argument and tap num
 float GUIData::getTapParam(tapParam t, int tapNum){
 	// tapNum - [1...8]
-	return this->params[tapNum * (this->maxTaps - 1)  + 2 + (int) t];
+	return this->params[tapNum * 8  + 1 + (int) t];
 }

@@ -6,7 +6,6 @@ Author: Purusottam Samal
 #include <libraries/Gui/Gui.h>
 #include <libraries/Scope/Scope.h>
 #include <libraries/AudioFile/AudioFile.h>
-#include <libraries/math_neon/math_neon.h>
 #include <vector>
 #include "Global.h"
 #include "GrnTap.h"
@@ -87,7 +86,6 @@ void render(BelaContext *context, void *userData) // Called each block
 	
 	if (gui.isConnected()) {
 		for (unsigned int n = 0; n < context->audioFrames; n++){
-			
 
 			if(++elapsedSamps > endFrame)
 				elapsedSamps = startFrame;

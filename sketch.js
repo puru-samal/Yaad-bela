@@ -174,13 +174,14 @@ function draw() {
   }
   
   for (let i = 0; i < maxTaps; i++) {
-    globalParams[7*i+9]  = (60000 * noteVals[tapCtrls[i].delVal]) / TEMPO;
-    globalParams[7*i+10] = (60000 * noteVals[tapCtrls[i].szVal]) / TEMPO;
-    globalParams[7*i+11] = tapCtrls[i].rateVal;
-    globalParams[7*i+12] = dirVals[tapCtrls[i].dirVal][0];
-    globalParams[7*i+13] = envVals[tapCtrls[i].envVal][0];
-    globalParams[7*i+14] = tapCtrls[i].lpfVal;
-    globalParams[7*i+15] = tapCtrls[i].hpfVal;
+    globalParams[8*i+9]  = (60000 * noteVals[tapCtrls[i].delVal]) / TEMPO;
+    globalParams[8*i+10] = (60000 * noteVals[tapCtrls[i].szVal]) / TEMPO;
+    globalParams[8*i+11] = tapCtrls[i].rateVal;
+    globalParams[8*i+12] = dirVals[tapCtrls[i].dirVal][0];
+    globalParams[8*i+13] = envVals[tapCtrls[i].envVal][0];
+    globalParams[8*i+14] = tapCtrls[i].lpfVal;
+    globalParams[8*i+15] = tapCtrls[i].hpfVal;
+    globalParams[8*i+16] = tapCtrls[i].killState;
   }
   
   // Send data to Bela 	

@@ -19,5 +19,6 @@ enum tapParam {
 	plyDir,
 	grnEnv,
 	tapLPF,
-	tapHPF
+	tapHPF,
+	killSwitch
 };

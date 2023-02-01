@@ -77,6 +77,10 @@ void GrnScheduler::setParam(tapParam t){
 		case tapHPF:
 			this->hpf = this->Gui.getTapParam(tapHPF, this->tapNum);
 			break;
+			
+		case killSwitch:
+			this->kill = (int) this->Gui.getTapParam(killSwitch, this->tapNum);
+			break;
 		
 	};
 }
@@ -88,10 +92,10 @@ void GrnScheduler::setAllParams() {
 	setParam(plyRt);
 	setParam(plyDir);
 	setParam(grnEnv);
-	
 	// Independent filters havent been implemented yet
 	//setParam(tapLPF); 
 	//setParam(tapHPF);
+	setParam(killSwitch);
 }
 
 // Increments read pointer, Checks for grain triggers, Each tap has 8 grain voices
